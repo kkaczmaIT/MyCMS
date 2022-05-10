@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS USERS
     ID INTEGER PRIMARY KEY AUTO_INCREMENT UNIQUE,
     loginU VARCHAR(100),
     password VARCHAR(128),
-    isActive BOOLEAN,
-    homeDirectory VARCHAR(255),
+    is_active BOOLEAN,
+    home_directory VARCHAR(255),
     permission TINYINT,
     created_at DATETIME
 );
@@ -25,17 +25,17 @@ CREATE TABLE IF NOT EXISTS FILEREGISTER
 (
     ID INTEGER PRIMARY KEY AUTO_INCREMENT UNIQUE,
     ID_user INTEGER,
-    rootPath VARCHAR(255),
-    typeFile VARCHAR(255),
+    root_path VARCHAR(255),
+    type_file VARCHAR(255),
     type_mime VARCHAR(120),
     size INTEGER,
-    pathFile VARCHAR(255),
+    path_file VARCHAR(255),
     created_at DATETIME,
     modified_at DATETIME
 );
 
 CREATE INDEX IF NOT EXISTS FILEREGISTER_INDEX
-ON FILEREGISTER (ID, ID_user, pathFile);
+ON FILEREGISTER (ID, ID_user, path_file);
 
 CREATE TABLE IF NOT EXISTS LOGI
 (
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS WEBSITES
     title_website VARCHAR(300),
     shortcut_icon_path VARCHAR(255),
     ID_user INTEGER,
-    isActive BOOLEAN,
+    is_active BOOLEAN,
     ID_settings INTEGER,
     created_at DATETIME,
     modified_at DATETIME
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS CONTENTPAGE
     ID_page INTEGER,
     content VARCHAR(2000),
     role_section VARCHAR(255),
-    orderContent INTEGER
+    order_content INTEGER
 );
 
 CREATE INDEX IF NOT EXISTS CONTENT_INDEX
@@ -92,22 +92,22 @@ CREATE TABLE IF NOT EXISTS PAGESWEB
     keyphrases VARCHAR(70),
     description_meta VARCHAR(155),
     content VARCHAR(2000),
-    footerText VARCHAR(500)
+    footer_text VARCHAR(500)
 );
 
 -- PAGESWEB SUBTABLES --
 CREATE TABLE IF NOT EXISTS THEME
 (
     ID INTEGER PRIMARY KEY UNIQUE AUTO_INCREMENT,
-    customFields VARCHAR(2000)
+    custom_fields VARCHAR(2000)
 );
 
 CREATE TABLE IF NOT EXISTS MODULES
 (
     ID INTEGER PRIMARY KEY UNIQUE AUTO_INCREMENT,
-    moduleName VARCHAR(255),
+    module_name VARCHAR(255),
     ID_file INTEGER,
-    roleModule VARCHAR(255)
+    role_module VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS MENU
@@ -120,10 +120,10 @@ CREATE TABLE IF NOT EXISTS LIST_ITEM
 (
     ID INTEGER PRIMARY KEY UNIQUE AUTO_INCREMENT,
     ID_menu INTEGER,
-    textLink VARCHAR(255),
+    text_link VARCHAR(255),
     href VARCHAR(400),
     depth INTEGER,
-    orderItem INTEGER
+    order_item INTEGER
 );
 
 -- Foreign keys

@@ -1,13 +1,19 @@
 <?php
 //Load content .env file
 require 'vendor/autoload.php';
-require 'databaseController.php';
+//require_once 'baseClasses/Database.php';
 use Dotenv\Dotenv;
-use Src\System\DatabaseController;
+use System\Database;
 $dotenv = new DotEnv(__DIR__);
 $dotenv->load();
 
-$databaseConnectionSql = (new DatabaseController())->getConnectionSql();
-$databaseConnectionRedis = (new DatabaseController())->getConnectionRedis();
-$databaseConnectionRedis->set("test", "Witaj");
+//Auto load based classes
+spl_autoload_register(function($className) 
+{
+    require_once __DIR__ . '/' . $className . '.php';
+});
+
+// change to handle models
+$databaseConnectionSql = (new Database())->getConnectionSql();
+$databaseConnectionRedis = (new Database())->getConnectionRedis();
 
