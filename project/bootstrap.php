@@ -16,4 +16,5 @@ spl_autoload_register(function($className)
 // change to handle models
 $databaseConnectionSql = (new Database())->getConnectionSql();
 $databaseConnectionRedis = (new Database())->getConnectionRedis();
+// some stuff
 
