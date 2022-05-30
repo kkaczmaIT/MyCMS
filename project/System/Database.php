@@ -144,7 +144,6 @@ class Database
      * case remove table name and id
      * 
      * @param [type] $table_name - name table of SQL
-     * @param [type] $ID_record_redis - id of record in redis
      * @return void
      */
     public function saveRecordActivity($type, $table_name)
@@ -156,6 +155,7 @@ class Database
             switch($type)
             {
                 case 'create':
+                    
                     $query = 'INSERT INTO ' . $table_name . ' (';
                     $columns = '';
                     $values = '';
@@ -217,21 +217,25 @@ class Database
                             }
                             
                         }
-                        $query = rtrim($query, ', ');
-                        $query .= ' WHERE ID = ' . $IDRecord;
-                        $this->startTransaction();
-                        $this->loadQuery($query);
-                        if($this->executeQuery())
+                        if(isset($IDRecord))
                         {
-                            $this->endTransaction('COMMIT');
-                            infoLog($_ENV['MODE'], 'Record modified from ' . $table_name . ' ID: ' . $IDRecord);
-                            $this->dbRedisConnection->clearStatus($key);
+                            $query = rtrim($query, ', ');
+                            $query .= ' WHERE ID = ' . $IDRecord;
+                            $this->startTransaction();
+                            $this->loadQuery($query);
+                            if($this->executeQuery())
+                            {
+                                $this->endTransaction('COMMIT');
+                                infoLog($_ENV['MODE'], 'Record modified from ' . $table_name . ' ID: ' . $IDRecord);
+                                $this->dbRedisConnection->clearStatus($key);
+                            }
+                            else
+                            {
+                                $this->endTransaction('ROLLBACK');
+                               infoLog($_ENV['MODE'], 'Modified record failed');
+                            }
                         }
-                        else
-                        {
-                            $this->endTransaction('ROLLBACK');
-                           infoLog($_ENV['MODE'], 'Modified record failed');
-                        }
+
                     }
                 break;
                 case 'remove':

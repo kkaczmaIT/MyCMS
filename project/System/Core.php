@@ -1,5 +1,6 @@
 <?php
     namespace System;
+    use System\Engine\Controllers\Users;
     /**
      * Managment Controllers
      * Creates URL & loads    core controller
@@ -7,7 +8,7 @@
      */
     class Core 
     {
-        protected $currentController = 'Pages';
+        protected $currentController = 'Websites';
         protected $currentMethod = 'index';
         protected $params = [];
 
@@ -15,7 +16,7 @@
         {
             $url = $this->getUrl();
             // Look in controllers for first value
-            if(file_exists('../engine/controllers/' . ucwords($url[0]) . '.php'))
+            if(file_exists(__DIR__ . '\Controllers\\' . ucwords($url[0]) . '.php'))
             {
                 // If exists, set as controller
                 $this->currentController = ucwords($url[0]);
@@ -24,10 +25,11 @@
             }
 
             // Require the controller
-            require_once '../engine/controllers/' . $this->currentController . '.php';
+            require_once __DIR__ .  '\Controllers\\' . $this->currentController . '.php';
 
             // Instatntiate controller class
-            $this->currentController = new $this->currentController;
+            $this->currentController = 'System\Controllers\\' . $this->currentController;
+            $this->currentController = new  $this->currentController;
 
             // Check for second part of url
             if(isset($url[1]))
@@ -43,11 +45,9 @@
 
             // Get params
             $this->params = $url ? array_values($url) : [];
-
             // Call a callback with array of params
             call_user_func_array(
-                [$this->currentController, $this->currentMethod], $this->params
-            );
+                [$this->currentController, $this->currentMethod], $this->params);
         }
 
         public function getUrl()

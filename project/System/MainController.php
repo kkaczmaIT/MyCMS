@@ -1,19 +1,22 @@
 <?php
     namespace System;
+    use System\Models;
     /**
     * Base Controller - must be    extend to direct controller
     * Load models and views
+    * $params - list of arguments to constructor
     */
     class MainController
     {
         // Load model
         // Model - model name
-        public function model($model) {
+        public function model($model, $params = []) {
             // Require mode file
-            require_once '../engine/models/' . $model . '.php';
+            require_once 'Models\\' . $model . '.php';
 
+            $model = 'System\Models\\' . $model;
             //Instatiate model
-            return new $model();
+            return new $model(...$params);
         }
 
         /**
@@ -24,9 +27,9 @@
         public function view($view, $data = [])
         {
             // Check for view file
-            if(file_exists('../engine/views/' . $view . '.php'))
+            if(file_exists(__DIR__ . '\views\\' . $view . '.php'))
             {
-                require_once '../engine/views/' . $view . '.php';
+                require_once __DIR__ . '\views\\' . $view . '.php';
             }
             else
             {

@@ -143,6 +143,7 @@
             {
                 infoLog($_ENV['MODE'], 'Error: unable to get request parameters');
                 echo $e->getMessage();
+                return false;
             }
         }
 
@@ -173,7 +174,7 @@
         foreach($reqParam as $key => $value)
         {
             $tmp = $this->getRecord($name, array($key));
-            if($tmp[$key] == false)
+            if($tmp[$key] === false)
             {
                 infoLog($_ENV['MODE'], 'key is not in list');
             }
@@ -182,6 +183,7 @@
                 if($this->redis->hMSet($name, array($key => $value)))
                 {
                     $this->updateStatus('modified_' . $name, [$key => $value]);
+                    infoLog($_ENV['MODE'], 'update record status: success');
                 }
                 else
                 {
@@ -191,7 +193,8 @@
                
             }
         }
-        infoLog($_ENV['MODE'], 'update record status: success');
+        $this->updateStatus('modified_' . $name, $this->getRecord($name, ['ID']));
+        return true;
     }
 
 
