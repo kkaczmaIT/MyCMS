@@ -126,6 +126,7 @@
             {
                 infoLog($_ENV['MODE'], 'User registered');
                 $this->addIDRedis($this->redisTableName . $ID);
+                $this->forceUpdateSQLDatabase();
                 return true;
             }
             else
@@ -154,10 +155,10 @@
                     {
                         if(password_verify($password, $user['password']))
                         {
-                            $userWithID = [$this->ID_users[$ID], ...$user];
+                            $userWithID = ['ID_redis' => $this->ID_users[$ID], ...$user];
                             infoLog($_ENV['MODE'], 'User logged in');
                             //return record of user data from database
-                            return $user;
+                            return $userWithID;
                         }
                         else
                         {
@@ -315,9 +316,9 @@
             }
         }
 
+        // Update sql database and integrity with redis database
         public function forceUpdateSQLDatabase()
         {
-            $info = $this->dbRedis->getStatus('all');
             $this->db->saveRecordActivity('create', 'USERS');
             $this->db->saveRecordActivity('modified', 'USERS');
             $this->db->saveRecordActivity('remove', 'USERS');

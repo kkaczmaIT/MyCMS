@@ -1,5 +1,5 @@
 <?php
-//Load content .env file
+//Load content .env file and bootstrap
 require '../vendor/autoload.php';
 require_once 'Utility.php';
 //require_once 'baseClasses/Database.php';

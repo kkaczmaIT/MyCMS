@@ -1,23 +1,28 @@
 <?php
-   require_once dirname(dirname(__FILE__)) . '/header.php';
+   require_once dirname(dirname(__FILE__)) . '/system/header.php';
+   require_once dirname(dirname(__FILE__)) . '/system/navbar.php';
 ?>
-   <div class="container">
-        <form method="post" action="<?php $_SERVER['PHP_SELF'] ?>">
-            <div class="form-field">
-                <label for="login">Login</label>
-                <input type="text" name="login" maxlength="100">
-                <span class="error-message"><?php echo $data['login_err']; ?></span>
+<div class="container">
+        <div class="row justify-content-md-center">
+            <div class="col-12">
+            <div class="alert alert-danger d-none" id="msg-result"></div>
+                <form method="post" id="login-form" onsubmit="loginU(event)">
+                    <div class="my-3 justify-content-center d-flex flex-column">
+                        <label class="form-label" for="login">Login</label>
+                        <input class="form-control" type="text" id="login" name="login" maxlength="100">
+                        <span id="login_err" class="error-message text-danger"><?php echo $data['login_err']; ?></span>
+                    </div>
+                    
+                    <div class="my-3">
+                        <label class="form-label" for="password">Hasło</label>
+                        <input class="form-control" type="password" id="password" name="password" maxlength="20", minlength="8">
+                        <span id="password_err" class="error-message text-danger"><?php echo $data['password_err']; ?></span>
+                    </div>
+                    <input class="btn btn-primary" id="login-button" type="submit" onclick="loginU(event)" value="Zaloguj się">
+                </form>
             </div>
-            
-            <div class="form-field">
-                <label for="password">Hasło</label>
-                <input type="password" name="password" maxlength="20", minlength="8">
-                <span class="error-message"><?php echo $data['password_err']; ?></span>
-            </div>
-            <input type="submit" value="Zaloguj się">
-        </form>
+        </div>
     </div>
 <?php
-   require_once dirname(dirname(__FILE__)) . '/footer.php';
-    
+   require_once dirname(dirname(__FILE__)) . '/system/footer.php';
 ?>
