@@ -11,13 +11,16 @@
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>home">Panel</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>users">Inni użytkownicy</a>
+              <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>users/userslist">Inni użytkownicy</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>websites">Witryny</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>files">Pliki</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>users/settings">Ustawienia</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>users/logout">Wyloguj</a>

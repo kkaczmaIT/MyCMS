@@ -149,6 +149,7 @@ class Database
     public function saveRecordActivity($type, $table_name)
     {
         $status = $this->dbRedisConnection->getStatus('all');
+        print_r($status);
         $keys = array_keys($status);
         if($status)
         {

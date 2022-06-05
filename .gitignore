@@ -2,3 +2,5 @@ logi commands.txt
 /project/vendor
 /project/.env
 /project/composer.lock
+/project/public/bootstrap
+/project/storage

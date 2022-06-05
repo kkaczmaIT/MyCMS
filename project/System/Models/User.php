@@ -189,14 +189,16 @@
         /**
          * Update data of user. Can change at least one of parameters or more. Update current object which logged in
          *
-         * @param [string] $ID_user - ID redis record 
+         * @param [string] $user_login - ID sql record 
          * @param [string] $password - new password
          * @param [string] $is_active - change status
          * @param [string] $permission - change permisson - useless for now
          * @return [bool] modified user or false
          */
-        public function updateUser($ID_user, $password ="", $is_active = "", $permission = "")
+        public function updateUser($user_login, $password ="", $is_active = "", $permission = "")
         {
+            $logins = $this->getColumnsFromRedisID($this->ID_users, ['loginU']);
+            $ID_user = $this->ID_users[checkRedundantPhraseGetID($user_login, $logins, 'loginU')];
             if(isset($password) || isset($is_active) || isset($permission))
             {
                 if(isset($password))
@@ -304,16 +306,20 @@
         /**
          * Change Status
          *
-         * @param [string] $ID_user - id record in redis
+         * @param [string] $login_user - user_login
          * @param [bool] $status - user/'s status
          * @return void
          */
-        public function changeStatusUser($ID_user, $status)
+        public function changeStatusUser($user_login, $status)
         {
+            $logins = $this->getColumnsFromRedisID($this->ID_users, ['loginU']);
+            $ID_user = $this->ID_users[checkRedundantPhraseGetID($user_login, $logins, 'loginU')];
             if($this->updateUser($ID_user, null, $status, null))
             {
                 infoLog($_ENV['MODE'], 'User\'s status changed');
+                return true;
             }
+            return false;
         }
 
         // Update sql database and integrity with redis database

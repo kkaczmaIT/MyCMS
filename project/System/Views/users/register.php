@@ -2,7 +2,7 @@
    require_once dirname(dirname(__FILE__)) . '/system/header.php';
    require_once dirname(dirname(__FILE__)) . '/system/navbar.php';
 ?>
-    <div class="container">
+    <div class="container mt-5"  style="min-height: 70vh;">
         <div class="row justify-content-md-center">
             <div class="col-12">
                 <div class="alert alert-success d-none" id="msg-result"></div>

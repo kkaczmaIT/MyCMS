@@ -1,4 +1,4 @@
-<footer class="mt-4 fixed-bottom">
+<footer style="height: 5vh;" class="mt-4">
     <div class="row bg-light py-3">
         <div class="col">
             <h4></h4>
@@ -7,7 +7,7 @@
     </div>
 </footer>
 
-<script src="<?php echo getenv("CMS_URL"); ?>public/bootstrap/js/bootstrap.min.js"></script>
-<script src="<?php echo getenv("CMS_URL"); ?>public/js/main.js"></script>
+<script async src="<?php echo getenv("CMS_URL"); ?>public/bootstrap/js/bootstrap.min.js"></script>
+<script async src="<?php echo getenv("CMS_URL"); ?>public/js/main.js"></script>
 </body>
 </html>
