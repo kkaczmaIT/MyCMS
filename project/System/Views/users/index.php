@@ -15,10 +15,10 @@
     </div>
     <?php else : ?>
 
-        <div class="container my-5">
+        <div class="container my-5" style="min-height: 70vh;">
         <article>
             <aside>
-                <a href="<?php echo getenv('CMS_URL'); ?>users/userslist" class="btn btn-secondary">Powróć do listy użytkowników</a>
+                <a href="<?php echo getenv('CMS_URL'); ?>users/userslist" class="btn btn-secondary my-3">Powróć do listy użytkowników</a>
             </aside>
             <header>
                 <h1>Użytkownik</h1>

@@ -142,8 +142,15 @@ use System\MainController;
                         if($user = $this->userModel->getUserDataByLogin($data['login']))
                         {
                             $info = null;
+                            $infoimg = null;
+                            $infothemes = null;
+                            $infowebsites = null;
                             system('mkdir ' . getenv('STORAGE_PATH') . $user['home_directory'], $info);
-                            if(!$info)
+                            system('mkdir ' . getenv('STORAGE_PATH') . $user['home_directory'] . '\img', $infoimg);
+                            system('mkdir ' . getenv('STORAGE_PATH') . $user['home_directory'] . '\themes',  $infothemes);
+                            system('mkdir ' . getenv('STORAGE_PATH') . $user['home_directory'] . '\themes\modules', $infothemes);
+                            system('mkdir ' . getenv('STORAGE_PATH') . $user['home_directory'] . '\websites', $infowebsites);
+                            if(!$info && !$infoimg && !$infothemes && !$infowebsites)
                             {
                                 infoLog(getenv('MODE'), 'User home directory created');
                             }
@@ -392,7 +399,7 @@ use System\MainController;
             $userArr['status'] = 'pending';
             if(isLogged())
             {
-                if($_SERVER['REQUEST_METHOD'] == 'GET' && isLogged())
+                if($_SERVER['REQUEST_METHOD'] == 'GET')
                 {
                     if($userArr['data'] = $this->userModel->getUsersLogin($ID))
                     {
@@ -485,7 +492,7 @@ use System\MainController;
                 {
                     if($user = $this->userModel->login($data['login'], $data['password']))
                     {
-                        $this->createUserSession($user['ID'], $user['loginU']);
+                        $this->createUserSession($user['ID'], $user['loginU'], $user['is_active'], $user['home_directory'], $user['permission']);
                         //flash('register_success', 'User registered. Go to Login page', 'bg-success');
                         http_response_code(200);
                         $dataFeedback['message'] = 'Pomyślnie zalogowano do systemu. Trwa przekierowanie do panelu.';
@@ -516,12 +523,18 @@ use System\MainController;
          *
          * @param [type] $id - ID of user
          * @param [type] $login - login user
+         * @param [type] $is_active - status user
+         * @param [type] $home_direcotry - home directory user
+         * @param [type] $permission = user's permission
          * @return void
          */
-        private function createUserSession($ID, $login)
+        private function createUserSession($ID, $login, $is_active, $home_directory, $permission)
         {
             $_SESSION['user_id'] = $ID;
             $_SESSION['user_login'] = $login;
+            $_SESSION['is_active'] = $is_active;
+            $_SESSION['home_directory'] = $home_directory;
+            $_SESSION['permission'] = $permission;
         }
 
         /**
@@ -533,6 +546,9 @@ use System\MainController;
         {
             unset($_SESSION['user_id']);
             unset($_SESSION['user_login']);
+            unset($_SESSION['is_active']);
+            unset($_SESSION['home_directory']);
+            unset($_SESSION['permission']);
             session_destroy();
         }
 

@@ -119,11 +119,11 @@ class Database
         $redisIDRecord = array();
         foreach($data as $row)
         {
-            if($this->dbRedisConnection->saveRecord($ID_record_redis . ':' . $row['ID'], $row))
+            if($this->dbRedisConnection->saveRecord($ID_record_redis  . $row['ID'], $row))
             {
                 array_push($redisIDRecord, $ID_record_redis . $row['ID']);
                 infoLog($_ENV['MODE'], 'Row has loaded');
-                $this->dbRedisConnection->clearStatus('create_' . $ID_record_redis . ':' . $row['ID']);
+                $this->dbRedisConnection->clearStatus('create_' . $ID_record_redis . $row['ID']);
             }
             else
             {
@@ -149,7 +149,6 @@ class Database
     public function saveRecordActivity($type, $table_name)
     {
         $status = $this->dbRedisConnection->getStatus('all');
-        print_r($status);
         $keys = array_keys($status);
         if($status)
         {

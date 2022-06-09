@@ -314,7 +314,7 @@
         {
             $logins = $this->getColumnsFromRedisID($this->ID_users, ['loginU']);
             $ID_user = $this->ID_users[checkRedundantPhraseGetID($user_login, $logins, 'loginU')];
-            if($this->updateUser($ID_user, null, $status, null))
+            if($this->updateUser($user_login, null, $status, null))
             {
                 infoLog($_ENV['MODE'], 'User\'s status changed');
                 return true;

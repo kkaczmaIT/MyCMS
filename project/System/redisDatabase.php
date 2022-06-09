@@ -155,10 +155,12 @@
                 $this->clearStatus($name);
                 $this->saveStatus('remove_' . $name, ['ID' => $ID['ID']]); 
                 infoLog($_ENV['MODE'], 'clear record status: successfully');
+                return true;
             }
             else
             {
                 infoLog($_ENV['MODE'], 'clear record status: failed');
+                return false;
             }
         }
 

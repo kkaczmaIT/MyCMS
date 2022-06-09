@@ -78,7 +78,7 @@
          * @param [string] $phrase - new phrase
          * @param [array] $data - array of current phrase. format array[ ['column' => phrase1], [ 'column' => phrase2] ]
          * @param [string] column - name of key in single array from $data to compare; 
-         * @return [number] ID - actual ID in array
+         * @return [number/null] ID - actual ID in array
          */
         function checkRedundantPhraseGetID($phrase, $data, $column)
         {
@@ -93,7 +93,7 @@
                $index++;
             }
             infoLog($_ENV['MODE'], 'Phrase not repeated');
-            return false;
+            return -1;
         }
 
         function flash($name = '', $message = '', $class = '')

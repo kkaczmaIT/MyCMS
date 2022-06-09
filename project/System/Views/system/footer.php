@@ -8,6 +8,6 @@
 </footer>
 
 <script async src="<?php echo getenv("CMS_URL"); ?>public/bootstrap/js/bootstrap.min.js"></script>
-<script async src="<?php echo getenv("CMS_URL"); ?>public/js/main.js"></script>
+<script async src="<?php echo getenv("CMS_URL"); ?>public/js/users.js"></script>
 </body>
 </html>
