@@ -2,7 +2,7 @@
     namespace System\Models;
     use System\Database;
     
-    class PagesWeb
+    class Pagesweb
     {
         private $db;
         private $dbSql;
@@ -16,7 +16,6 @@
             $this->dbRedis = $this->db->getConnectionRedis();
             $this->redisTableName = $tableName;
             $this->ID_pagesWebs = $this->loadTablePagesWeb();
-            var_dump($this->ID_pagesWebs);
         }
 
         /**
@@ -26,7 +25,7 @@
          */
         private function loadTablePagesWeb()
         {
-            $this->db->loadQuery('SELECT ID, ID_menu, ID_theme, ID_website, title, keyphrases, description_meta, content, footertext FROM PAGESWEB');
+            $this->db->loadQuery('SELECT ID, ID_menu, ID_theme, ID_website, title, keyphrases, description_meta, content, footer_text FROM PAGESWEB');
             $this->db->executeQuery();
             $pagesWebs = $this->db->resultSet();
             $IDRedisPagesWebs = $this->db->dataTableLoadToRedis($this->redisTableName, $pagesWebs);
@@ -85,6 +84,93 @@
 
         }
         
+        public function getWebsitesByUserID($ID = 'all')
+        {
+            $userWebsites = array();
+            if($websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID', 'title_website', 'shortcut_icon_path', 'ID_user', 'is_active', 'ID_settings']))
+            {
+                foreach($websites as $website)
+                {
+                    if($_SESSION['user_id'] == $website['ID_user'])
+                    {
+                        array_push($userWebsites, $website);
+                    }
+                }
+                if($ID == 'all')
+                    return $userWebsites;
+                elseif(is_numeric($ID))
+                {
+                    $index = checkRedundantPhraseGetID($ID, $userWebsites, 'ID');
+                    if($index != -1)
+                    {
+                        return $userWebsites[$index];
+                    }
+                    else
+                    {
+                        infoLog(getenv('MODE'), 'ID website not found');
+                        return false;
+                    }
+                }
+                else
+                {
+                    infoLog(getenv('MODE'), 'Something went wrong.');
+                    return false;
+                }
+            }
+            else
+            {
+                infoLog(getenv('MODE'), 'Something went wrong.');
+                return false;
+            }
+
+        }
+
+        /**
+         * Get website's pages and return or specific website's page
+         *
+         * @param string $ID_pages - specific id or all page
+         * @return void
+         */
+        public function getPagesWeb($ID_pages = 'all')
+        {
+            $pagesWebsites = array();
+            if($pages = $this->getColumnsFromRedisID($this->ID_pagesWebs, ['ID', 'ID_menu', 'ID_theme', 'ID_website', 'title', 'keyphrases', 'description_meta', 'content', 'footer_text']))
+            {
+                foreach($pages as $page)
+                {
+                    if($_SESSION['website_id'] == $page['ID_website'])
+                    {
+                        array_push($pagesWebsites, $page);
+                    }
+                }
+                if($ID_pages == 'all')
+                    return $pagesWebsites;
+                elseif(is_numeric($ID_pages))
+                {
+                    $index = checkRedundantPhraseGetID($ID_pages, $pages, 'ID');
+                    if($index != -1)
+                    {
+                        return $pagesWebsites[$index];
+                    }
+                    else
+                    {
+                        infoLog(getenv('MODE'), 'ID page not found');
+                        return false;
+                    }
+                }
+                else
+                {
+                    infoLog(getenv('MODE'), 'Something went wrong.');
+                    return false;
+                }
+            }
+            else
+            {
+                infoLog(getenv('MODE'), 'Something went wrong.');
+                return false;
+            }
+        }
+
        /**
         * Create new Page. Need convenient handle variable session in controller
         *

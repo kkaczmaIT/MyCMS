@@ -129,7 +129,7 @@
         public function getWebsitesByUserID($ID = 'all')
         {
             $userWebsites = array();
-            if($websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID', 'title_website', 'shortcut_icon_path', 'ID_user', 'is_active']))
+            if($websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID', 'title_website', 'shortcut_icon_path', 'ID_user', 'is_active', 'ID_settings']))
             {
                 foreach($websites as $website)
                 {
@@ -207,8 +207,10 @@
                             infoLog(getenv('MODE'), 'Website icon not updated');
                             return false;
                         }
+                        $this->forceUpdateSQLDatabase();
                         return true;
                     }
+
                 }
                 else
                 {
@@ -244,6 +246,7 @@
                         if($this->dbRedis->updateRecord($this->ID_websites[$index], ['is_active' => $status]))
                         {
                             infoLog(getenv('MODE'), 'Website status changed');
+                            $this->forceUpdateSQLDatabase();
                         }
                         else
                         {

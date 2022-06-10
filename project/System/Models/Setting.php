@@ -26,8 +26,8 @@
          */
         private function loadTableSettings()
         {
-            $this->db->loadQuery('SELECT SETTINGS.ID, PHP_version, limit_upload_file_size, contact FROM SETTINGS INNER JOIN WEBSITES ON SETTINGS.ID = WEBSITES.ID_settings WHERE WEBSITES.ID_user=:id_user');
-            $this->db->executeQuery(['id_user' => $_SESSION['user_id']]);
+            $this->db->loadQuery('SELECT ID, PHP_version, limit_upload_file_size, contact FROM SETTINGS');
+            $this->db->executeQuery();
             $users = $this->db->resultSet();
             $IDRedisUsers = $this->db->dataTableLoadToRedis($this->redisTableName, $users);
             return $IDRedisUsers;
@@ -205,5 +205,36 @@
             }
     
         }
+
+        public function getSettingsByID($ID)
+        {
+            if(is_numeric($ID))
+            {
+                if($settings = $this->getColumnsFromRedisID($this->ID_settings, ['ID', 'PHP_version', 'limit_upload_file_size', 'contact']))
+                {
+                    foreach($settings as $setting)
+                    {
+                        if($ID == $setting['ID'])
+                        {
+                            return $setting;
+                        }
+                    }
+                }
+                else
+                {
+                    infoLog(getenv('MODE'), 'Something went wrong.');
+                    return false;
+                }
+            }
+            else
+            {
+                infoLog(getenv('MODE'), 'Something went wrong.');
+                return false;
+            }
+        }
+
+      
+
+        
     }
 ?>

@@ -137,6 +137,9 @@
             }
         }
 
-        
+        function scanUserMediaFiles($catalog)
+        {
+            return scandir($catalog);
+        }
 
 ?>
