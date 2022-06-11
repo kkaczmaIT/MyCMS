@@ -9,15 +9,13 @@
         private $dbRedis;
         private $ID_listitems  = array();
         private $redisTableName;
-        private $ID_menu;
-        public function __construct($tableName, $ID_menu) 
+        public function __construct($tableName) 
         {
             $this->db = new Database;
             $this->dbSql = $this->db->getConnectionSql();
             $this->dbRedis = $this->db->getConnectionRedis();
             $this->redisTableName = $tableName;
             $this->ID_listitems = $this->loadTableListItem();
-            $this->ID_menu = $ID_menu;
         }
 
         /**
@@ -27,8 +25,8 @@
          */
         private function loadTableListItem()
         {
-            $this->db->loadQuery('SELECT ID, ID_menu,text_link, href, depth, order_item FROM LISTITEM WHERE ID_menu=:menu_id');
-            $this->db->executeQuery(['menu_id' => $this->ID_menu]);
+            $this->db->loadQuery('SELECT ID, ID_menu,text_link, href, depth, order_item FROM LISTITEM');
+            $this->db->executeQuery();
             $listItems = $this->db->resultSet();
             $IDRedisListItem = $this->db->dataTableLoadToRedis($this->redisTableName, $listItems);
             return $IDRedisListItem;
@@ -48,7 +46,7 @@
         private function getLastID($separator)
         {
             $ID_last = 0;
-            $listItems = $this->ID_websites;
+            $listItems = $this->ID_listitems;
             foreach($listItems as $listItem)
             {
                 $ID = explode($separator, $listItem);
@@ -95,12 +93,13 @@
          * @param [type] $order_item - position in set
          * @return void
          */
-        public function createListItem($text_link, $href, $depth, $order_item)
+        public function createListItem($text_link, $href, $depth, $order_item, $ID_menu)
         {
             $IDNewRecord = (int)$this->getLastID('_:') + 1;
             $dataListItem = array(
                 'ID' => $IDNewRecord,
-                'ID_menu' => $this->ID_menu,
+                'ID_menu' => $ID_menu,
+                'text_link' => $text_link,
                 'href' => $href,
                 'depth' => $depth,
                 'order_item' => $order_item
@@ -125,19 +124,46 @@
          *
          * @return void
          */
-        public function getWebsitesByUserID()
+        public function getListItemsByMenuID($ID)
         {
-            $userWebsites = array();
-            if($websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID', 'title_website', 'shortcut_icon_path', 'ID_user', 'is_active']))
+            $menuItems = array();
+            if($listItems = $this->getColumnsFromRedisID($this->ID_listitems, ['ID', 'ID_menu', 'text_link', 'href', 'depth', 'order_item']))
             {
-                foreach($websites as $website)
+                foreach($listItems as $listItem)
                 {
-                    if($_SESSION['user_id'] == $website['ID_user'])
+                    if( $ID == $listItem['ID_menu'])
                     {
-                        array_push($userWebsites, $website);
+                        array_push($menuItems, $listItem);
                     }
                 }
-                return $userWebsites;
+                return $menuItems;
+            }
+            else
+            {
+                infoLog(getenv('MODE'), 'Something went wrong.');
+                return false;
+            }
+
+        }
+
+/**
+         * Return list of user's websites
+         *
+         * @return void
+         */
+        public function getListItemByID($ID)
+        {
+            $item = array();
+            if($listItems = $this->getColumnsFromRedisID($this->ID_listitems, ['ID', 'ID_menu', 'text_link', 'href', 'depth', 'order_item']))
+            {
+                foreach($listItems as $listItem)
+                {
+                    if( $ID == $listItem['ID'])
+                    {
+                        array_push($item, $listItem);
+                    }
+                }
+                return $item;
             }
             else
             {
@@ -155,40 +181,68 @@
          * @param [type] $shortcut_icon_path
          * @return [bool] true/false
          */
-        public function updateWebsite($ID, $title_website, $shortcut_icon_path)
+        public function updateListItem($ID, $text_link, $href, $depth, $order_item)
         {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
+            $IDSQL_listitem = $this->getColumnsFromRedisID($this->ID_listitems, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_listitem, 'ID');
             if($index)
             {
-                if(isset($title_website) || isset($shortcut_icon_path))
+                if(isset($text_link) || isset($href) || isset($depth) || isset($order_item))
                 {
-                    if(isset($title_website))
+                    if(isset($text_link))
                     {
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['title_website' => $title_website]))
+                        if($this->dbRedis->updateRecord($this->ID_listitems[$index], ['text_link' => $text_link]))
                         {
-                            infoLog(getenv('MODE'), 'Website title updated');
+                            infoLog(getenv('MODE'), 'List item title updated');
                         }
                         else
                         {
-                            infoLog(getenv('MODE'), 'Website title not updated');
+                            infoLog(getenv('MODE'), 'List item title not updated');
                             return false;
                         }
                     }
 
-                    if(isset($shortcut_icon_path))
+                    if(isset($href))
                     {
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['shortcut_icon_path' => $shortcut_icon_path]))
+                        if($this->dbRedis->updateRecord($this->ID_listitems[$index], ['href' => $href]))
                         {
-                            infoLog(getenv('MODE'), 'Website icon updated');
+                            infoLog(getenv('MODE'), 'Href updated');
                         }
                         else
                         {
-                            infoLog(getenv('MODE'), 'Website icon not updated');
+                            infoLog(getenv('MODE'), 'Href not updated');
                             return false;
                         }
-                        return true;
                     }
+
+                    if(isset($depth))
+                    {
+                        if($this->dbRedis->updateRecord($this->ID_listitems[$index], ['depth' => $depth]))
+                        {
+                            infoLog(getenv('MODE'), 'Depth updated');
+                        }
+                        else
+                        {
+                            infoLog(getenv('MODE'), 'Depth not updated');
+                            return false;
+                        }
+                    }
+
+                    if(isset($order_item))
+                    {
+                        if($this->dbRedis->updateRecord($this->ID_listitems[$index], ['order_item' => $order_item]))
+                        {
+                            infoLog(getenv('MODE'), 'Order updated');
+                        }
+                        else
+                        {
+                            infoLog(getenv('MODE'), 'Order not updated');
+                            return false;
+                        }
+
+                    }
+                    $this->forceUpdateSQLDatabase();
+                    return true;
                 }
                 else
                 {
@@ -198,63 +252,22 @@
             }
             else
             {
-                infoLog(getenv('MODE'), 'ID Website not found');
+                infoLog(getenv('MODE'), 'ID List Item not found');
                 return false;
             }
     
         }
 
-             /**
-         * Update title and icon website 
-         *
-         * @param [type] $ID - id website
-         * @param [type] $title_website 
-         * @param [type] $shortcut_icon_path
-         * @return [bool] true/false
-         */
-        public function changeStatusWebsite($ID, $status)
-        {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
-            if($index)
-            {
-                if(isset($status))
-                {
 
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['is_active' => $status]))
-                        {
-                            infoLog(getenv('MODE'), 'Website status changed');
-                        }
-                        else
-                        {
-                            infoLog(getenv('MODE'), 'Website status not changed');
-                            return false;
-                        }
-                        return true;
-                }
-                else
-                {
-                    infoLog(getenv('MODE'), 'status is empty');
-                    return false;
-                }
-            }
-            else
-            {
-                infoLog(getenv('MODE'), 'ID Website not found');
-                return false;
-            }
-    
-        }
-
-        public function deleteWebsite($ID)
+        public function deleteListItem($ID)
         {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
+            $IDSQL_listitem = $this->getColumnsFromRedisID($this->ID_listitems, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_listitem, 'ID');
             if($index != -1)
             {
-                if($this->dbRedis->clearRecord($this->ID_websites[$index]))
+                if($this->dbRedis->clearRecord($this->ID_listitems[$index]))
                 {
-                    infoLog(getenv('MODE'), 'Website deleted');
+                    infoLog(getenv('MODE'), 'List item deleted');
                     $this->forceUpdateSQLDatabase();
                     return true;
                 }

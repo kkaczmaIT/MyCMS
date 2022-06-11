@@ -17,9 +17,6 @@
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>websites/websitespanel">Witryny</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>fileregisters">Pliki</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="<?php echo getenv('CMS_URL'); ?>users/settings">Ustawienia</a>
             </li>
             <li class="nav-item">

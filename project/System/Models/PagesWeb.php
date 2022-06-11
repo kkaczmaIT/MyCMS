@@ -150,7 +150,7 @@
                     $index = checkRedundantPhraseGetID($ID_pages, $pages, 'ID');
                     if($index != -1)
                     {
-                        return $pagesWebsites[$index];
+                        return $pagesWebsites;
                     }
                     else
                     {
@@ -181,14 +181,14 @@
         * @param [type] $footer_text - text in footer
         * @return [bool] true/false
         */
-        public function createPagesWeb($title, $keyphrases, $description_meta, $content, $footer_text)
+        public function createPage($title, $keyphrases, $description_meta, $content, $footer_text, $ID_menu)
         {
             $IDNewRecord = (int)$this->getLastID('_:') + 1;
             $dataPagesWeb = array(
                 'ID' => $IDNewRecord,
-                'ID_menu' => 1,//last id
+                'ID_menu' => $ID_menu,//last id
                 'ID_theme' => 1, //default,
-                'ID_website' => 1, //session
+                'ID_website' => $_SESSION['website_id'], //session
                 'title' => $title,
                 'keyphrases' => $keyphrases,
                 'description_meta' => $description_meta,
@@ -211,21 +211,20 @@
         }
 
       /**
-       * Delete setting from database
+       * Delete pages from database
        *
        * @param [type] $ID - ID setting
        * @return [bool] - status of operation
        */  
-      public function deleteSetting($ID)
+      public function deletePage($ID)
         {
-            $IDSQL_settings = $this->getColumnsFromRedisID($this->ID_settings, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_settings, 'ID');
-            echo 'index:' . $index;
+            $IDSQL_page = $this->getColumnsFromRedisID($this->ID_pagesWebs, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_page, 'ID');
             if($index != -1)
             {
-                if($this->dbRedis->clearRecord($this->ID_settings[$index]))
+                if($this->dbRedis->clearRecord($this->ID_pagesWebs[$index]))
                 {
-                    infoLog(getenv('MODE'), 'setting deleted');
+                    infoLog(getenv('MODE'), 'pages deleted');
                     $this->forceUpdateSQLDatabase();
                     return true;
                 }
@@ -243,48 +242,92 @@
         }
 
         /**
-         * Update setting of website
+         * Update page data
          *
-         * @param [type] $ID - id setting
-         * @param [type] $limit_upload_file_size - limit file size to upload
-         * @param [type] $contact - contact display and use in contact section
+         * @param [type] $ID - id page
+         * @param [type] $title - title of page
+         * @param [type] $keyphrases - meta tag
+         * @param [type] $description_meta - meta tag
+         * @param [type] $content - content of page
+         * @param [type] $footer_text - text in footer
          * @return void
          */
-        public function updateSetting($ID, $limit_upload_file_size, $contact)
+        public function updatePage($ID, $title, $keyphrases, $description_meta, $content, $footer_text)
         {
-            $IDSQL_setting = $this->getColumnsFromRedisID($this->ID_settings, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_setting, 'ID');
+            $IDSQL_page = $this->getColumnsFromRedisID($this->ID_pagesWebs, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_page, 'ID');
             if($index != -1)
             {
-                if(isset($limit_upload_file_size) || isset($contact))
+                if(isset($title) || isset($keyphrases) || isset($description_meta) || isset($content) || isset($footer_text))
                 {
-                    if(isset($limit_upload_file_size))
+                    if(isset($title))
                     {
-                        if($this->dbRedis->updateRecord($this->ID_settings[$index], ['limit_upload_file_size' => $limit_upload_file_size]))
+                        if($this->dbRedis->updateRecord($this->ID_pagesWebs[$index], ['title' => $title]))
                         {
-                            infoLog(getenv('MODE'), 'Limit file size updated');
+                            infoLog(getenv('MODE'), 'Title page updated');
                         }
                         else
                         {
-                            infoLog(getenv('MODE'), 'limit file size not updated');
+                            infoLog(getenv('MODE'), 'Title page not updated');
                             return false;
                         }
                     }
 
-                    if(isset($contact))
+                    if(isset($keyphrases))
                     {
-                        if($this->dbRedis->updateRecord($this->ID_settings[$index], ['contact' => $contact]))
+                        if($this->dbRedis->updateRecord($this->ID_pagesWebs[$index], ['keyphrases' => $keyphrases]))
                         {
-                            infoLog(getenv('MODE'), 'Website contact updated');
+                            infoLog(getenv('MODE'), 'Page keyphrases updated');
                         }
                         else
                         {
-                            infoLog(getenv('MODE'), 'Website contact not updated');
+                            infoLog(getenv('MODE'), 'Page keyphrases not updated');
                             return false;
                         }
-                        $this->forceUpdateSQLDatabase();
-                        return true;
                     }
+
+                    if(isset($description_meta))
+                    {
+                        if($this->dbRedis->updateRecord($this->ID_pagesWebs[$index], ['description_meta' => $description_meta]))
+                        {
+                            infoLog(getenv('MODE'), 'Page description meta tag updated');
+                        }
+                        else
+                        {
+                            infoLog(getenv('MODE'), 'Page description meta tag not updated');
+                            return false;
+                        }
+                    }
+
+                    
+                    if(isset($content))
+                    {
+                        if($this->dbRedis->updateRecord($this->ID_pagesWebs[$index], ['content' => $content]))
+                        {
+                            infoLog(getenv('MODE'), 'Page content updated');
+                        }
+                        else
+                        {
+                            infoLog(getenv('MODE'), 'Page content  not updated');
+                            return false;
+                        }
+                    }
+
+                    if(isset($content))
+                    {
+                        if($this->dbRedis->updateRecord($this->ID_pagesWebs[$index], ['footer_text' => $footer_text]))
+                        {
+                            infoLog(getenv('MODE'), 'Page footer text updated');
+                        }
+                        else
+                        {
+                            infoLog(getenv('MODE'), 'Page footer text  not updated');
+                            return false;
+                        }
+                        
+                    }
+                    $this->forceUpdateSQLDatabase();
+                    return true;
                 }
                 else
                 {
@@ -294,7 +337,7 @@
             }
             else
             {
-                infoLog(getenv('MODE'), 'ID setting not found');
+                infoLog(getenv('MODE'), 'ID page not found');
                 return false;
             }
     

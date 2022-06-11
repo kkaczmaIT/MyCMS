@@ -49,6 +49,10 @@ class Websites extends MainController
             {
                 if($websiteArr['data'] = $this->websiteModel->getWebsitesByUserID($ID))
                 {
+                    if(is_numeric((int)$ID))
+                    $_SESSION['website_id'] = $ID;
+                    else
+                    unset($_SESSION['website_id']);
                     $websiteArr['status'] = 'success';
                     echo json_encode($websiteArr);
                 }

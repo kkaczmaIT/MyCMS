@@ -6,7 +6,7 @@
 <div class="container mt-5"  style="min-height: 70vh;">
     <header>
         <h5 class="text-darken d-block">Witaj <?php echo $_SESSION['user_login']; ?></h5>
-        <p>Poniżej znajdują się aktywne witryny.</p>
+        <p>Podejmij działanie wybierając pozycję z menu.</p>
     </header>
     
 </div>

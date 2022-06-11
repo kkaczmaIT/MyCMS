@@ -10,14 +10,13 @@
         private $ID_menus  = array();
         private $ID_menu;
         private $redisTableName;
-        public function __construct($tableName, $ID_menu) 
+        public function __construct($tableName) 
         {
             $this->db = new Database;
             $this->dbSql = $this->db->getConnectionSql();
             $this->dbRedis = $this->db->getConnectionRedis();
             $this->redisTableName = $tableName;
             $this->ID_menus = $this->loadTableMenu();
-            $this->ID_menu = $ID_menu;
         }
 
         /**
@@ -27,8 +26,8 @@
          */
         private function loadTableMenu()
         {
-            $this->db->loadQuery('SELECT M.ID, M.level_menu FROM MENU M WHERE PAGESWEB.ID_menu=:pagesweb_menu_id');
-            $this->db->executeQuery(['pagesweb_menu_id' => $this->ID_menu]);
+            $this->db->loadQuery('SELECT M.ID, M.level_menu FROM MENU M');
+            $this->db->executeQuery();
             $menus = $this->db->resultSet();
             $IDRedisMenus = $this->db->dataTableLoadToRedis($this->redisTableName, $menus);
             return $IDRedisMenus;
@@ -37,7 +36,7 @@
 
         private function addIDRedis($ID)
         {
-            array_push($this->ID_websites, $ID);
+            array_push($this->ID_menus, $ID);
         }
         
         /**
@@ -90,9 +89,9 @@
          * Create new menu
          *
          * @param [type] $level_menu - level menu
-         * @return true/false
+         * @return int/false - ID new menu or false
          */
-        public function createListItem($level_menu)
+        public function createMenu($level_menu)
         {
             $IDNewRecord = (int)$this->getLastID('_:') + 1;
             $dataMenu = array(
@@ -105,7 +104,7 @@
                 infoLog($_ENV['MODE'], 'Menu created');
                 $this->addIDRedis($this->redisTableName . $IDNewRecord);
                 $this->forceUpdateSQLDatabase();
-                return true;
+                return $IDNewRecord;
             }
             else
             {
@@ -119,19 +118,19 @@
          *
          * @return void
          */
-        public function getWebsitesByUserID()
+        public function getMenuByID($ID)
         {
-            $userWebsites = array();
-            if($websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID', 'title_website', 'shortcut_icon_path', 'ID_user', 'is_active']))
+            $pageMenu = array();
+            if($menus = $this->getColumnsFromRedisID($this->ID_menus, ['ID', 'level_menu']))
             {
-                foreach($websites as $website)
+                foreach($menus as $menu)
                 {
-                    if($_SESSION['user_id'] == $website['ID_user'])
+                    if($ID == $menu['ID'])
                     {
-                        array_push($userWebsites, $website);
+                        array_push($pageMenu, $menu);
                     }
                 }
-                return $userWebsites;
+                return $pageMenu;
             }
             else
             {
@@ -142,47 +141,33 @@
         }
 
         /**
-         * Update title and icon website 
+         * Update level_menu 
          *
-         * @param [type] $ID - id website
-         * @param [type] $title_website 
-         * @param [type] $shortcut_icon_path
+         * @param [type] $ID - id menu
+         * @param [type] $level_menu - depth of menu
          * @return [bool] true/false
          */
-        public function updateWebsite($ID, $title_website, $shortcut_icon_path)
+        public function updateMenu($ID, $level_menu)
         {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
+            $IDSQL_menus = $this->getColumnsFromRedisID($this->ID_menus, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_menus, 'ID');
             if($index)
             {
-                if(isset($title_website) || isset($shortcut_icon_path))
+                if(isset($level_menu))
                 {
-                    if(isset($title_website))
+                    if(isset($level_menu))
                     {
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['title_website' => $title_website]))
+                        if($this->dbRedis->updateRecord($this->ID_menus[$index], ['level_menu' => $level_menu]))
                         {
-                            infoLog(getenv('MODE'), 'Website title updated');
+                            infoLog(getenv('MODE'), 'Menu updated');
                         }
                         else
                         {
-                            infoLog(getenv('MODE'), 'Website title not updated');
+                            infoLog(getenv('MODE'), 'Menu not updated');
                             return false;
                         }
                     }
-
-                    if(isset($shortcut_icon_path))
-                    {
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['shortcut_icon_path' => $shortcut_icon_path]))
-                        {
-                            infoLog(getenv('MODE'), 'Website icon updated');
-                        }
-                        else
-                        {
-                            infoLog(getenv('MODE'), 'Website icon not updated');
-                            return false;
-                        }
-                        return true;
-                    }
+                    return true;
                 }
                 else
                 {
@@ -192,63 +177,22 @@
             }
             else
             {
-                infoLog(getenv('MODE'), 'ID Website not found');
+                infoLog(getenv('MODE'), 'ID Menu not found');
                 return false;
             }
     
         }
 
-             /**
-         * Update title and icon website 
-         *
-         * @param [type] $ID - id website
-         * @param [type] $title_website 
-         * @param [type] $shortcut_icon_path
-         * @return [bool] true/false
-         */
-        public function changeStatusWebsite($ID, $status)
-        {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
-            if($index)
-            {
-                if(isset($status))
-                {
 
-                        if($this->dbRedis->updateRecord($this->ID_websites[$index], ['is_active' => $status]))
-                        {
-                            infoLog(getenv('MODE'), 'Website status changed');
-                        }
-                        else
-                        {
-                            infoLog(getenv('MODE'), 'Website status not changed');
-                            return false;
-                        }
-                        return true;
-                }
-                else
-                {
-                    infoLog(getenv('MODE'), 'status is empty');
-                    return false;
-                }
-            }
-            else
-            {
-                infoLog(getenv('MODE'), 'ID Website not found');
-                return false;
-            }
-    
-        }
-
-        public function deleteWebsite($ID)
+        public function deleteMenu($ID)
         {
-            $IDSQL_websites = $this->getColumnsFromRedisID($this->ID_websites, ['ID']);
-            $index = checkRedundantPhraseGetID($ID, $IDSQL_websites, 'ID');
+            $IDSQL_menus = $this->getColumnsFromRedisID($this->ID_menus, ['ID']);
+            $index = checkRedundantPhraseGetID($ID, $IDSQL_menus, 'ID');
             if($index != -1)
             {
-                if($this->dbRedis->clearRecord($this->ID_websites[$index]))
+                if($this->dbRedis->clearRecord($this->ID_menus[$index]))
                 {
-                    infoLog(getenv('MODE'), 'Website deleted');
+                    infoLog(getenv('MODE'), 'Menu deleted');
                     $this->forceUpdateSQLDatabase();
                     return true;
                 }
