@@ -26,3 +26,14 @@ File include information about MariaDB connection. Mode is setting to change opt
 
 ### Login form
 ![login site](login.png)
+
+### Websites dashboard
+![Websites Dashboard](websitedashboard.png)
+
+### Creation website
+![Creation website form](addingwebsite.png)
+
+### Website setting
+![Website settings](websitesettings.png)
+
+Website's settings allow on edit data, disable website, adding pages, change limit size file and contact data 
