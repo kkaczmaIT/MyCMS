@@ -13,4 +13,16 @@ Connection with MariaDB provide PDO extension. MariaDB is responsible for store 
 
 ### Configuration
 To configure application necessary is saved .env file own settings.
-![.env file](file .env.png)
+
+![.env file](file.env.png)
+
+File include information about MariaDB connection. Mode is setting to change option to test mode and normal mode. Test mode show additional information and allow error debugging. In file is possible to change app name and URL address and location to store users files.
+
+## Usage
+
+### Registration form
+
+![registration site](registration.png)
+
+### Login form
+![login site](login.png)
