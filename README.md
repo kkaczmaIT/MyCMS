@@ -36,4 +36,16 @@ File include information about MariaDB connection. Mode is setting to change opt
 ### Website setting
 ![Website settings](websitesettings.png)
 
-Website's settings allow on edit data, disable website, adding pages, change limit size file and contact data 
+Website's settings allow on edit data, disable website, adding pages, change limit size file and contact data.
+
+### Adding pages
+![Adding page form](singlepage.png)
+
+### Menu single page
+![Adding menu](menupage.png)
+
+### Main settings
+![Main settings](settingsaccount.png)
+
+### Users search
+![Users search](users.png)
