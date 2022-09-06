@@ -7,6 +7,7 @@ Project to management content site. Project allows on create multi website with 
 - MariaDB
 - JavaScript
 - Bootstrap
+- phpdotenv from Github [repository](https://github.com/vlucas/phpdotenv) 
 
 ### Implementation
 Connection with MariaDB provide PDO extension. MariaDB is responsible for store data and Redis for usage by system. Data are synchronised between Redis and MariaDB. Layout of site was created with Bootstrap's. JavaScript is responsible for communication with server and handle forms. Application logic is implemented by MVC architecture. Core of application is managed by URL address.
